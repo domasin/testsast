@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System;
+using Newtonsoft.Json;
 
 namespace WebApplication1.Controllers
 {
@@ -23,6 +25,7 @@ namespace WebApplication1.Controllers
         public IEnumerable<WeatherForecast> Get(string username, string password)
         {
             string connectionString = "Server=localhost;Database=TestDB;Trusted_Connection=True;";
+            
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
@@ -39,6 +42,8 @@ namespace WebApplication1.Controllers
                 else
                     Console.WriteLine("Credenziali non valide.");
             }
+
+            
 
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
