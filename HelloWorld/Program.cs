@@ -1,27 +1,32 @@
-﻿using System.Diagnostics;
-using System.Security.Cryptography;
-using System.Text;
-using iText.Kernel.Pdf;
-using iText.Layout;
-using iText.Layout.Element;
+﻿using System;
+using System.Data.SqlClient;
 
-string outputPath = "hello_world.pdf";
+class Program
+{
+    static void Main()
+    {
+        Console.Write("Inserisci username: ");
+        string username = Console.ReadLine();
 
-using var writer = new PdfWriter(outputPath);
-using var pdf = new PdfDocument(writer);
-using var document = new Document(pdf);
+        Console.Write("Inserisci password: ");
+        string password = Console.ReadLine();
 
-document.Add(new Paragraph("Hello World"));
+        string connectionString = "Server=localhost;Database=TestDB;Trusted_Connection=True;";
 
-Console.WriteLine($"PDF created: {Path.GetFullPath(outputPath)}");
+        using (SqlConnection conn = new SqlConnection(connectionString))
+        {
+            conn.Open();
 
-// test
-Console.Write("Inserisci comando: ");
-var userInput = Console.ReadLine() ?? "";
-Process.Start("cmd.exe", "/c " + userInput);
+            // ❌ VULNERABILE A SQL INJECTION
+            string query = $"SELECT COUNT(*) FROM Users WHERE Username = '{username}' AND Password = '{password}'";
 
-// Vulnerabilita intenzionale per test CodeQL: uso di algoritmo di hash debole.
-var weakHash = MD5.HashData(Encoding.UTF8.GetBytes("demo-secret"));
-Console.WriteLine($"MD5: {Convert.ToHexString(weakHash)}");
+            SqlCommand cmd = new SqlCommand(query, conn);
+            int count = (int)cmd.ExecuteScalar();
 
-Console.WriteLine($"PDF created: {Path.GetFullPath(outputPath)}");
+            if (count > 0)
+                Console.WriteLine("Login riuscito!");
+            else
+                Console.WriteLine("Credenziali non valide.");
+        }
+    }
+}
