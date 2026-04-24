@@ -97,3 +97,9 @@ jobs:
       uses: github/codeql-action/analyze@v4
       with:
         category: "/language:${{matrix.language}}"
+
+    - name: Upload SARIF file
+      uses: actions/upload-artifact@v4
+      with:
+        name: codeql-results
+        path: /home/runner/work/testsast/results/csharp.sarif
